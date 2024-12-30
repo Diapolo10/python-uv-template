@@ -113,10 +113,12 @@ python =
     pypy-3.10: pypy3
 
 [testenv]
-passenv = GITHUB_*
+pass_env =
+    GITHUB_*
+    FORCE_COLOR
 allowlist_externals = uv
 
 commands =
-    uv run --frozen pytest
-    uv run --frozen coverage report
+    {envpython} -m pytest
+    {envpython} -m coverage report
 """

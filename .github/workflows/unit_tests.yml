@@ -7,12 +7,19 @@
 
 name: Unit tests
 
-on: [ push ]
+on: [ push, pull_request, workflow_dispatch ]
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         python-version: [
@@ -40,7 +47,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         cache-dependency-glob: "uv.lock"
-        enable-cache: true
+        enable-cache: false
         python-version: ${{ matrix.python-version }}
         version: "0.5.13"
 
@@ -50,7 +57,7 @@ jobs:
 
     - name: Run Tox (Pytest + Coverage)
       run: |
-        uv run --frozen tox
+        uvx --with tox-uv tox
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PLATFORM: ${{ matrix.os }}
@@ -80,7 +87,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         cache-dependency-glob: "uv.lock"
-        enable-cache: false
+        enable-cache: true
 
     - name: Install Python
       uses: actions/setup-python@v5
