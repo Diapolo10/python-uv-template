@@ -119,6 +119,6 @@ pass_env =
 allowlist_externals = uv
 
 commands =
-    {envpython} -m pytest
-    {envpython} -m coverage report
+    uv run --frozen pytest
+    uv run --frozen coverage report
 """
