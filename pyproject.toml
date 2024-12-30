@@ -1,0 +1,122 @@
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[project]
+name = "python-uv-template"
+dynamic = ["version"]
+description = "A template uv project structure."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.0.1",
+    "tomli>=2.2.1; python_version < '3.11'",
+]
+
+[dependency-groups]
+dev = [
+    "hatch>=1.14.0",
+    "mypy>=1.14.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.8.4",
+    "tox>=4.23.2",
+    "tox-gh-actions>=3.2.0",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: not covered",
+    "@overload",
+]
+
+[tool.coverage.run]
+branch = true
+relative_files = true
+omit = [
+    ".tox/*",
+    "tests/*",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/project_name"]
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = """
+--doctest-modules \
+--cov=./ \
+--cov-append \
+--cov-report html:tests/reports/coverage-html \
+--cov-report xml:tests/reports/coverage.xml \
+--ignore=docs/
+"""
+testpaths = [
+    "tests",
+]
+
+[tool.ruff]
+lint.select = ["ALL"]
+lint.ignore = [
+    "COM812",  # Missing trailing comma (disabled due to formatter conflict)
+    "D203",    # One blank line before class docstring
+    "D212",    # Multi-line summary first line
+    "ISC001",  # Single-line implicit string concatenation (disabled due to formatter conflict)
+    "PLR0913", # Too many arguments
+    "Q000",    # Single quotes found but double quotes preferred
+]
+line-length = 120
+show-fixes = true
+src = ["src",]
+target-version = "py39"
+
+[tool.ruff.lint.flake8-copyright]
+author = "Lari Liuhamo"
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+multiline-quotes = "double"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+# https://beta.ruff.rs/docs/rules/
+"__init__.py" = ["F401", "F403", "F405",]
+"tests/*" = ["ANN", "ARG", "INP001", "S101",]
+"logger.py" = ["N815",]
+
+[tool.ruff.lint.pylint]
+max-args = 15
+max-branches = 20
+max-returns = 10
+max-statements = 80
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py39, py310, py311, py312, pypy3
+skip_missing_interpreters = true
+
+[gh-actions]
+python =
+    3.9: py39
+    3.10: py310
+    3.11: py311
+    3.12: py312
+    pypy-3.10: pypy3
+
+[testenv]
+passenv = GITHUB_*
+allowlist_externals = poetry
+
+commands =
+    poetry run pytest
+    poetry run coverage report
+"""
