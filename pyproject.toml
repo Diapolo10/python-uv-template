@@ -114,9 +114,9 @@ python =
 
 [testenv]
 passenv = GITHUB_*
-allowlist_externals = poetry
+allowlist_externals = uv
 
 commands =
-    poetry run pytest
-    poetry run coverage report
+    uv run --frozen pytest
+    uv run --frozen coverage report
 """
