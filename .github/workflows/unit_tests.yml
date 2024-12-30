@@ -80,7 +80,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         cache-dependency-glob: "uv.lock"
-        enable-cache: true
+        enable-cache: false
 
     - name: Install Python
       uses: actions/setup-python@v5
