@@ -7,7 +7,7 @@ name = "python-uv-template"
 dynamic = ["version"]
 description = "A template uv project structure."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
     "python-dotenv>=1.0.1",
     "tomli>=2.2.1; python_version < '3.11'",
