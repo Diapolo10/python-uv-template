@@ -122,7 +122,3 @@ commands =
     uv run --frozen pytest
     uv run --frozen coverage report
 """
-
-[tool.uv-dynamic-versioning]
-strict = false
-vcs = "git"
