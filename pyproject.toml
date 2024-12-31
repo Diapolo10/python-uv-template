@@ -101,7 +101,7 @@ ban-relative-imports = "all"
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py39, py310, py311, py312, pypy3
+env_list = py3{9, 10, 11, 12}, pypy3
 skip_missing_interpreters = true
 
 [gh-actions]
@@ -122,3 +122,7 @@ commands =
     uv run --frozen pytest
     uv run --frozen coverage report
 """
+
+[tool.uv-dynamic-versioning]
+strict = true
+vcs = "git"
