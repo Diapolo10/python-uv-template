@@ -29,9 +29,6 @@ jobs:
         cache-dependency-glob: "uv.lock"
         enable-cache: true
 
-    - name: Install Poetry
-      uses: Gr1N/setup-poetry@v9
-
     - name: Install library and dependencies
       run: |
         uv sync --frozen

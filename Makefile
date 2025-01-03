@@ -36,7 +36,7 @@ lint: $(INSTALL_STAMP)
     # Configured in pyproject.toml
     # Skips mypy if not installed
     # 
-    # $(POETRY) run black --check $(TESTS) $(PYMODULE) --diff
+    # $(UV) run black --check $(TESTS) $(PYMODULE) --diff
 	@if [ -z $(MYPY) ]; then echo "Mypy not found, skipping..."; else echo "Running Mypy..."; $(UV) run mypy $(PYMODULE) $(TESTS); fi
 	@echo "Running Ruff..."; $(UV) run ruff . --fix
 
