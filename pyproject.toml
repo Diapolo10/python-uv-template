@@ -12,6 +12,31 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "tomli>=2.2.1; python_version < '3.11'",
 ]
+authors = [
+    {name = "Lari Liuhamo", email = "lari.liuhamo+pypi@gmail.com"},
+]
+maintainers = [
+    {name = "Lari Liuhamo", email = "lari.liuhamo+pypi@gmail.com"},
+]
+license = {file = "LICENSE"}
+keywords = ["python3",]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/project-name/"
+Repository = "https://github.com/Diapolo10/project-name"
+Documentation = "https://github.com/Diapolo10/project-name/tree/main/docs"
 
 [dependency-groups]
 dev = [
