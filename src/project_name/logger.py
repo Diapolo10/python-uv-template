@@ -132,7 +132,7 @@ class JSONLogFormatter(logging.Formatter):
             "message": record.getMessage(),
             "timestamp": dt.datetime.fromtimestamp(
                 record.created,
-                tz=dt.timezone.utc,
+                tz=dt.UTC,
             ),
         }
 
