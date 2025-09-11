@@ -9,62 +9,117 @@ import logging
 import logging.config
 import logging.handlers
 import time
-from enum import Enum, auto
+import tomllib
+from enum import Enum
 from pathlib import Path
-from typing import Any, NotRequired, TypedDict, override
+from typing import Any, Literal, override
 
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
+from pydantic import BaseModel, Field, ValidationError
 
 from project_name.config import LOGGER_CONFIG_FILE, PACKAGE_NAME
+
+LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
+
+class FormatKeys(BaseModel):
+    level: str | None = Field(..., alias="levelname")
+    message: str | None
+    timestamp: str | None
+    logger: str | None = Field(..., alias="name")
+    module: str | None
+    function: str | None = Field(..., alias="funcName")
+    line_number: int | None = Field(..., alias="lineno")
+    thread_name: str | None = Field(..., alias="threadName")
+    model_config = {
+        "extra": "allow",
+    }
+
+
+class FormatterConfig(BaseModel):
+    factory: str | None = Field('logging.Formatter', alias="()")
+    format: str | None
+    datefmt: str | None
+    # fmt_keys: FormatKeys | None = None
+    model_config = {
+        "extra": "allow",
+    }
+
+
+class HandlerConfig(BaseModel):
+    class_: str = Field(..., alias="class")
+    level: LogLevel | None
+    formatter: str | None
+    stream: str | None
+    filename: str | None
+    max_bytes: int | None = Field(..., alias="maxBytes")
+    backup_count: int | None = Field(..., alias="backupCount")
+    handlers: list[str] | None
+    respect_handler_level: bool
+
+
+
+class LoggerConfig(BaseModel):
+    level: LogLevel
+    handlers: list[str]
+
+
+class LoggingConfig(BaseModel):
+    version: int
+    disable_existing_loggers: bool = False
+    formatters: dict[str, FormatterConfig]
+    handlers: dict[str, HandlerConfig]
+    loggers: dict[str, LoggerConfig]
+    root: LoggerConfig | None
+
+
+STDOUT_LOG_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
+FILE_LOG_FORMAT = "%(asctime)s [%(levelname)s] %(padded_module)s:L%(padded_lineno)s | %(padded_funcName)s: %(message)s"
 
 ROOT_LOGGER_NAME = PACKAGE_NAME
 
 __all__ = ("ROOT_LOGGER_NAME", "setup_logging")
 
 
-class RecordAttrs(str, Enum):
-    """Log record attributes."""
-
-    @override
-    @staticmethod
-    def _generate_next_value_(name: str, start: int, count: int, last_values: list) -> str:
-        """Create enum values from the names automatically."""
-        return name
-
-    args = auto()
-    asctime = auto()
-    created = auto()
-    exc_info = auto()
-    exc_text = auto()
-    filename = auto()
-    funcName = auto()
-    levelname = auto()
-    levelno = auto()
-    lineno = auto()
-    module = auto()
-    msecs = auto()
-    message = auto()
-    msg = auto()
-    name: str = "name"
-    pathname = auto()
-    process = auto()
-    processName = auto()
-    relativeCreated = auto()
-    stack_info = auto()
-    thread = auto()
-    threadName = auto()
-    taskName = auto()
+RecordAttrs = Enum(
+    "RecordAttrs",
+    (
+        "args",
+        "asctime",
+        "created",
+        "exc_info",
+        "exc_text",
+        "filename",
+        "funcName",
+        "levelname",
+        "levelno",
+        "lineno",
+        "module",
+        "msecs",
+        "message",
+        "msg",
+        "name",
+        "pathname",
+        "process",
+        "processName",
+        "relativeCreated",
+        "stack_info",
+        "thread",
+        "threadName",
+        "taskName"
+    ),
+    type=str,
+)
 
 
 class ColouredFormatter(logging.Formatter):
     """Coloured log formatter."""
 
-    # This enforces UTC timestamps regardless of local timezone
-    # and is necessary for easier log comparisons
-    converter = time.gmtime
+    @staticmethod
+    def _utc_time(timestamp: float | None = None) -> time.struct_time:
+        """Enforce UTC timestamps regardless of local timezone."""
+        return time.gmtime(timestamp)
+
+    converter = _utc_time
 
     @override
     def format(self, record: logging.LogRecord) -> str:
@@ -77,31 +132,26 @@ class ColouredFormatter(logging.Formatter):
             logging.DEBUG: "\033[36;40m",  # Cyan
         }
         reset = "\033[0m"
+        colour = log_level_colours.get(record.levelno, reset)
 
-        record.msg = f"{log_level_colours.get(record.levelno, reset)}{record.msg}{reset}"
-        record.levelname = f"{log_level_colours.get(record.levelno, reset)}{record.levelname:^8}{reset}"
+        record.levelname = f"{record.levelname:^8}"
 
-        return super().format(record)
+        # Save original values to restore later
+        original_msg = record.msg
+        original_levelname = record.levelname
 
+        # Apply colour
+        record.msg = f"{colour}{original_msg}{reset}"
+        record.levelname = f"{colour}{original_levelname}{reset}"
 
-class FormatKeys(TypedDict):
-    """Log format keys."""
+        # Format the record with the temporary values
+        formatted_message = super().format(record)
 
-    message: NotRequired[str]
-    timestamp: NotRequired[dt.datetime]
-    level: NotRequired[str]
-    logger: NotRequired[str]
-    module: NotRequired[str]
-    function: NotRequired[str]
-    line: NotRequired[int]
-    thread_name: NotRequired[str]
+        # Restore the original values to avoid side-effects
+        record.msg = original_msg
+        record.levelname = original_levelname
 
-
-class LogDict(FormatKeys):
-    """Specify keys log entries can contain."""
-
-    exc_info: NotRequired[str]
-    stack_info: NotRequired[str]
+        return formatted_message
 
 
 class CustomQueueHandler(logging.handlers.QueueHandler):
@@ -111,51 +161,46 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         queue_handler = logging.getHandlerByName("queue_handler")
         if queue_handler is None:
-            super().__init__(*args, **kwargs)  # type: ignore[arg-type]
+            super().__init__(*args, **kwargs)
 
 
 class JSONLogFormatter(logging.Formatter):
     """Custom JSON log formatter."""
 
     @override
-    def __init__(self, *, fmt_keys: FormatKeys | None = None) -> None:
+    def __init__(self, *, fmt_keys: dict[str, Any] | None = None) -> None:
         super().__init__()
-        self.fmt_keys = fmt_keys if fmt_keys is not None else FormatKeys()
+        self.fmt_keys = fmt_keys if fmt_keys is not None else {}
 
     @override
     def format(self, record: logging.LogRecord) -> str:
         message = self._prepare_log_dict(record)
         return json.dumps(message, default=str)
 
-    def _prepare_log_dict(self, record: logging.LogRecord) -> LogDict:
-        required_fields: LogDict = {
+    def _prepare_log_dict(self, record: logging.LogRecord) -> dict[str, Any]:
+        log_dict = {
             "message": record.getMessage(),
-            "timestamp": dt.datetime.fromtimestamp(
-                record.created,
-                tz=dt.timezone.utc,
-            ),
+            "timestamp": dt.datetime.fromtimestamp(record.created, tz=dt.UTC),
         }
 
-        if record.exc_info is not None:
-            required_fields["exc_info"] = self.formatException(record.exc_info)
+        for key, value in self.fmt_keys.items():
+            log_dict[key] = getattr(record, value)
 
-        if record.stack_info is not None:
-            required_fields["stack_info"] = self.formatStack(record.stack_info)
+        if record.exc_info:
+            log_dict["exc_info"] = self.formatException(record.exc_info)
 
-        message: LogDict = {  # type: ignore[assignment]
-            key: msg_val
-            if (msg_val := required_fields.pop(val, None)) is not None  # type: ignore[misc, typeddict-item]
-            else getattr(record, val)  # type: ignore[call-overload]
-            for key, val in self.fmt_keys.items()
-        }
+        if record.stack_info:
+            log_dict["stack_info"] = self.formatStack(record.stack_info)
 
-        message.update(required_fields)
+        standard_attrs = set(RecordAttrs.__members__)
+        standard_attrs.update(log_dict.keys())
 
-        for key, val in record.__dict__.items():
-            if key not in RecordAttrs:
-                message[key] = val  # type: ignore[literal-required]
+        extra_attrs = record.__dict__.keys() - log_dict.keys() - standard_attrs
 
-        return message
+        for key in extra_attrs:
+            log_dict[key] = record.__dict__[key]
+
+        return log_dict
 
 
 def setup_logging() -> None:
@@ -163,9 +208,22 @@ def setup_logging() -> None:
     (Path.cwd() / "logs").mkdir(exist_ok=True)
     logger_data = LOGGER_CONFIG_FILE.read_text(encoding="utf-8")
     logging_config = tomllib.loads(logger_data)
-    logging.config.dictConfig(logging_config)
+
+    try:
+        validated_config = LoggingConfig.model_validate(logging_config)
+    except ValidationError:
+        print(f"Error: Invalid logging config in {LOGGER_CONFIG_FILE}")  # noqa: T201
+        raise
+
+    logging.config.dictConfig(validated_config.model_dump(by_alias=True))
 
     queue_handler = logging.getHandlerByName("queue_handler")
-    if queue_handler is not None:
-        queue_handler.listener.start()  # type: ignore[attr-defined]
-        atexit.register(queue_handler.listener.stop)  # type: ignore[attr-defined]
+
+    if not isinstance(queue_handler, logging.handlers.QueueHandler):
+        return
+
+    if not (listener := getattr(queue_handler, "listener", None)):
+        return
+
+    listener.start()
+    atexit.register(listener.stop)

@@ -13,15 +13,15 @@ datefmt = "%Y-%m-%dT%H:%M:%S%z"
 [formatters.json]
 "()" = "project_name.logger.JSONLogFormatter"
 
-[formatter.json.fmt_keys]
-level = "levelname"
-message = "message"
-timestamp = "timestamp"
-logger = "name"
-module = "module"
-function = "funcName"
-line = "lineno"
-thread_name = "threadName"
+# [formatter.json.fmt_keys]
+# level = "levelname"
+# message = "message"
+# timestamp = "timestamp"
+# logger = "name"
+# module = "module"
+# function = "funcName"
+# line = "lineno"
+# thread_name = "threadName"
 
 [handlers.stdout]
 class = "logging.StreamHandler"
