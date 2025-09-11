@@ -9,9 +9,8 @@ name: Unit tests
 
 on:
   push:
-    branches-ignore:
-      - 'dependabot/**'  # Avoid duplicates; only run the PR, not the push
-      - 'gh-pages'  # GitHub Pages do not trigger all tests
+    branches:
+      - 'main'
     tags-ignore:
       - 'v*'  # Avoid re-running existing commit on release
   pull_request:
@@ -32,18 +31,11 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         python-version: [
-          '3.9',
-          '3.10',
           '3.11',
           '3.12',
-          'pypy-3.10',
+          '3.13',
+          'pypy-3.11',
         ]
-
-        exclude:
-          - os: windows-latest
-            python-version: pypy-3.10
-          - os: macos-latest
-            python-version: pypy-3.10
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
 
@@ -56,9 +48,8 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         cache-dependency-glob: "uv.lock"
-        enable-cache: false
+        enable-cache: true
         python-version: ${{ matrix.python-version }}
-        version: "0.5.13"
 
     - name: Install library and dependencies
       run: |
@@ -66,7 +57,7 @@ jobs:
 
     - name: Run Tox (Pytest + Coverage)
       run: |
-        uvx --with tox-uv tox
+        uv run tox
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PLATFORM: ${{ matrix.os }}
@@ -87,6 +78,7 @@ jobs:
     name: Build and publish Python 🐍 distributions 📦 to TestPyPI
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
 
     - name: Checkout repository
@@ -98,15 +90,13 @@ jobs:
         cache-dependency-glob: "uv.lock"
         enable-cache: true
 
-    - name: Install Python
-      uses: actions/setup-python@v6
-      with:
-        python-version-file: "pyproject.toml"
-
-    - name: Build
+    - name: Build release
       run: uv build
 
-    - name: Publish distribution 📦 to Test PyPI
+    - name: Publish test release 📦 to Test PyPI
       continue-on-error: true
-      run: uv publish --token ${{ secrets.PYPI_PASSWORD }} --index testpypi --publish-url https://test.pypi.org/legacy/
-
+      env:
+        UV_PUBLISH_URL: https://test.pypi.org/legacy/
+        UV_PUBLISH_CHECK_URL: https://test.pypi.org/simple/
+        UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_PASSWORD }}
+      run: uv publish
