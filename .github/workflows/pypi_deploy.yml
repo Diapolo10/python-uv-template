@@ -22,13 +22,12 @@ jobs:
         cache-dependency-glob: "uv.lock"
         enable-cache: true
 
-    - name: Install Python
-      uses: actions/setup-python@v6
-      with:
-        python-version-file: "pyproject.toml"
-
     - name: Build
       run: uv build
 
     - name: Publish distribution 📦 to PyPI
-      run: uv publish --token ${{ secrets.PYPI_PASSWORD }}
+      run: uv publish
+      env:
+        UV_PUBLISH_URL: https://upload.pypi.org/legacy/
+        UV_PUBLISH_CHECK_URL: https://pypi.org/simple/
+        UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_PASSWORD }}
