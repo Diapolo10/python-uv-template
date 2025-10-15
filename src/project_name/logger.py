@@ -48,7 +48,7 @@ class RecordAttrs(str, Enum):
     msecs = auto()
     message = auto()
     msg = auto()
-    name: str = "name"
+    name: str = "name"  # type: ignore[misc]
     pathname = auto()
     process = auto()
     processName = auto()
@@ -64,7 +64,7 @@ class ColouredFormatter(logging.Formatter):
 
     # This enforces UTC timestamps regardless of local timezone
     # and is necessary for easier log comparisons
-    converter = time.gmtime
+    converter = time.gmtime  # type: ignore[assignment]
 
     @override
     def format(self, record: logging.LogRecord) -> str:

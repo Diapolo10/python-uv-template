@@ -10,8 +10,8 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {file = "LICENSE"}
 dependencies = [
-    "pydantic>=2.11.7",
-    "python-dotenv>=1.0.1",
+    "pydantic>=2.12.2",
+    "python-dotenv>=1.1.1",
 ]
 authors = [
     {name = "Lari Liuhamo", email = "lari.liuhamo+pypi@gmail.com"},
@@ -32,13 +32,13 @@ classifiers = [
 
 [dependency-groups]
 dev = [
-    "hatch>=1.14.0",
-    "mypy>=1.17.0",
+    "hatch>=1.14.2",
+    "mypy>=1.18.2",
     "pytest>=8.4.2",
-    "pytest-cov>=6.3.0",
-    "ruff>=0.12.12",
-    "tox>=4.30.2",
-    "tox-gh-actions>=3.3.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.0",
+    "tox>=4.31.0",
+    "tox-gh-actions>=3.4.0",
 ]
 
 [project.urls]
