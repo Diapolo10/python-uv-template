@@ -947,14 +947,14 @@ wheels = [
 
 [[package]]
 name = "tox-gh-actions"
-version = "3.4.0"
+version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tox" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/81/91/fa0b628212675d81c5b400bc3d1923831c7de3ea4b06ba2b5ea43136fb9a/tox_gh_actions-3.4.0.tar.gz", hash = "sha256:76e80610fe5cda2f57af0ef45537d8f86c36d0bb8823feb20f85d30f4a7600ce", size = 18751, upload-time = "2025-10-10T15:10:07.351Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/11/6c3f818887c37a144a4b48bfc440150f006bdac7a68d92de1046680f578f/tox_gh_actions-3.5.0.tar.gz", hash = "sha256:cc8e148c4513042e5019973e5672594c3df241b035e7fb550f6f778588110051", size = 18815, upload-time = "2025-10-22T14:12:24.846Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/17/3dd6f646da0c2b5f47950f6a8259082f0e5de1a6a2f2d8e91dae6ff8efb0/tox_gh_actions-3.4.0-py3-none-any.whl", hash = "sha256:31abb90827472181c17ed07385493e4614fd8c03955e43fef42c06a366712850", size = 9768, upload-time = "2025-10-10T15:10:06.089Z" },
+    { url = "https://files.pythonhosted.org/packages/fd/9e/8d50f3b3fc4af8c73154f64d4a2293bfa2d517a19000e70ef2d614254084/tox_gh_actions-3.5.0-py3-none-any.whl", hash = "sha256:070790114c92f4c94337047515ca5e077ceb269a5cb9366e0a0b3440a024eca1", size = 9910, upload-time = "2025-10-22T14:12:23.405Z" },
 ]
 
 [[package]]
