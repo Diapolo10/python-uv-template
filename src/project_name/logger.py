@@ -9,7 +9,7 @@ import logging
 import logging.config
 import logging.handlers
 import time
-from enum import Enum, auto
+from enum import StrEnum, auto
 from pathlib import Path
 from typing import Any, NotRequired, TypedDict, override
 
@@ -25,7 +25,7 @@ ROOT_LOGGER_NAME = PACKAGE_NAME
 __all__ = ("ROOT_LOGGER_NAME", "setup_logging")
 
 
-class RecordAttrs(str, Enum):
+class RecordAttrs(StrEnum):
     """Log record attributes."""
 
     @override
