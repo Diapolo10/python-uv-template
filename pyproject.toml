@@ -37,7 +37,7 @@ dev = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.14.0",
-    "tox>=4.31.0",
+    "tox>=4.53.0",
     "tox-gh-actions>=3.4.0",
 ]
 
