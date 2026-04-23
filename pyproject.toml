@@ -33,7 +33,7 @@ classifiers = [
 [dependency-groups]
 dev = [
     "hatch>=1.14.2",
-    "mypy>=1.20.1",
+    "mypy>=1.20.2",
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "ruff>=0.15.11",
