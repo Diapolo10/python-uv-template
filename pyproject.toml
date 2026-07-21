@@ -8,15 +8,10 @@ dynamic = ["version"]
 description = "A template uv project structure."
 readme = "README.md"
 requires-python = ">=3.11"
-license = {file = "LICENSE"}
-dependencies = [
-    "pydantic>=2.13.4",
-    "python-dotenv>=1.1.1",
-]
-authors = [
-    {name = "Lari Liuhamo", email = "lari.liuhamo+pypi@gmail.com"},
-]
-keywords = ["python3",]
+license = { file = "LICENSE" }
+dependencies = ["pydantic>=2.13.4", "python-dotenv>=1.2.2"]
+authors = [{ name = "Lari Liuhamo", email = "lari.liuhamo+pypi@gmail.com" }]
+keywords = ["python3"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
@@ -37,7 +32,7 @@ dev = [
     "pytest>=9.1.1",
     "pytest-cov>=7.0.0",
     "ruff>=0.15.22",
-    "tox>=4.57.1",
+    "tox>=4.58.0",
     "tox-gh-actions>=3.4.0",
 ]
 
@@ -50,18 +45,12 @@ Documentation = "https://github.com/Diapolo10/project-name/tree/main/docs"
 main = "project_name.main:main"
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: not covered",
-    "@overload",
-]
+exclude_lines = ["pragma: not covered", "@overload"]
 
 [tool.coverage.run]
 branch = true
 relative_files = true
-omit = [
-    ".tox/*",
-    "tests/*",
-]
+omit = [".tox/*", "tests/*"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/project_name"]
@@ -79,9 +68,7 @@ addopts = """
 --cov-report xml:tests/reports/coverage.xml \
 --ignore=docs/
 """
-testpaths = [
-    "tests",
-]
+testpaths = ["tests"]
 
 [tool.ruff]
 lint.select = ["ALL"]
@@ -95,7 +82,7 @@ lint.ignore = [
 ]
 line-length = 120
 show-fixes = true
-src = ["src",]
+src = ["src"]
 
 [tool.ruff.lint.flake8-copyright]
 author = "Lari Liuhamo"
@@ -109,9 +96,9 @@ max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
 # https://beta.ruff.rs/docs/rules/
-"__init__.py" = ["F401", "F403", "F405", "PGH003",]
-"tests/*" = ["ANN", "ARG", "INP001", "S101",]
-"logger.py" = ["N815",]
+"__init__.py" = ["F401", "F403", "F405", "PGH003"]
+"tests/*" = ["ANN", "ARG", "INP001", "S101"]
+"logger.py" = ["N815"]
 
 [tool.ruff.lint.pylint]
 max-args = 15
@@ -150,7 +137,12 @@ commands =
 [tool.uv]
 cache-keys = [
     { file = "pyproject.toml" },
-    { git = { commit = true, tags = true }},
+    { git = { commit = true, tags = true } },
+]
+constraint-dependencies = [
+    "click>=8.4.2",          # Fixes PYSEC-2026-2132
+    "jaraco-context>=6.1.2", # Fixes PYSEC-2026-1469
+    "pygments>=2.20.0",      # Fixes CVE-2026-4539
 ]
 
 [tool.uv-dynamic-versioning]
