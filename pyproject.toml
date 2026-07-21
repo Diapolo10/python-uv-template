@@ -58,16 +58,17 @@ packages = ["src/project_name"]
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = """
---doctest-modules \
---cov=./ \
---cov-append \
---cov-report html:tests/reports/coverage-html \
---cov-report xml:tests/reports/coverage.xml \
---ignore=docs/
-"""
+[tool.pytest]
+minversion = "9.0"
+addopts = [
+    "--doctest-modules",
+    "--cov=./",
+    "--cov-append",
+    "--cov-report=html:tests/reports/coverage-html",
+    "--cov-report=term:skip-covered",
+    "--cov-report=xml:tests/reports/coverage.xml",
+    "--ignore=docs/",
+]
 testpaths = ["tests"]
 
 [tool.ruff]
