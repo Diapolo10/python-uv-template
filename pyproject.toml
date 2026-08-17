@@ -31,8 +31,8 @@ dev = [
     "mypy>=2.3.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.0.0",
-    "ruff>=0.16.2",
-    "tox>=4.59.0",
+    "ruff>=0.16.3",
+    "tox>=4.60.0",
     "tox-gh-actions>=3.4.0",
 ]
 
@@ -75,6 +75,7 @@ testpaths = ["tests"]
 lint.select = ["ALL"]
 lint.ignore = [
     "COM812",  # Missing trailing comma (disabled due to formatter conflict)
+    "CPY001",  # Missing copyright notice at top of file
     "D203",    # One blank line before class docstring
     "D212",    # Multi-line summary first line
     "ISC001",  # Single-line implicit string concatenation (disabled due to formatter conflict)
